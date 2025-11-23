@@ -19,6 +19,8 @@ const CITIES = [
 
 export default function SellProductPage() {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -35,37 +37,45 @@ export default function SellProductPage() {
       .then((data) => setCategories(data.data || []))
       .catch(() => {});
   }, []);
-
+  console.log(categories);
   const submit = () => {
-    if (!formData.name || !formData.price || !formData.category_name || !formData.city || !formData.pincode) {
-      toast.error("All fields required");
+    if (
+      !formData.name ||
+      !formData.price ||
+      !formData.category_name ||
+      !formData.city ||
+      !formData.pincode ||
+      !imageFile
+    ) {
+      toast.error("All fields including image required");
       return;
     }
+
     if (formData.pincode.length !== 6) {
       toast.error("Pincode must be 6 digits");
       return;
     }
 
-    const payload = {
-      name: formData.name,
-      description: formData.description,
-      price: Number(formData.price),
-      stock: Number(formData.stock),
-      category_name: formData.category_name,
-      city: formData.city,
-      pincode: formData.pincode
-    };
+    const uploadData = new FormData();
+    uploadData.append("name", formData.name);
+    uploadData.append("description", formData.description);
+    uploadData.append("price", formData.price);
+    uploadData.append("stock", formData.stock);
+    uploadData.append("category_name", formData.category_name);
+    uploadData.append("city", formData.city);
+    uploadData.append("pincode", formData.pincode);
+    uploadData.append("image", imageFile);
 
-    const id = toast.loading("Adding product");
+    const id = toast.loading("Adding product...");
 
     fetch("http://localhost:8080/products/", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: uploadData,
     })
       .then((res) => res.json())
       .then(() => {
-        toast.success("Product added successfully", { id });
+        toast.success("Product added successfully!", { id });
+
         setFormData({
           name: "",
           description: "",
@@ -75,34 +85,77 @@ export default function SellProductPage() {
           city: "",
           pincode: ""
         });
+
+        setImageFile(null);
       })
-      .catch(() => toast.error("Error", { id }));
+      .catch(() => toast.error("Error adding product", { id }));
   };
 
   return (
     <div className="max-w-xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-bold text-center">Sell Something</h1>
 
-      <Input name="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Product Name" />
-      <Input name="description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Description" />
-      <Input type="number" name="price" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} placeholder="Price" />
-      <Input type="number" name="stock" value={formData.stock} onChange={(e) => setFormData({ ...formData, stock: e.target.value })} placeholder="Stock" />
+      <Input
+        value={formData.name}
+        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+        placeholder="Product Name"
+      />
 
-      <select name="category_name" value={formData.category_name} onChange={(e) => setFormData({ ...formData, category_name: e.target.value })} className="border p-3 rounded-md w-full">
+      <Input
+        value={formData.description}
+        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+        placeholder="Description"
+      />
+
+      <Input
+        type="number"
+        value={formData.price}
+        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+        placeholder="Price"
+      />
+
+      <Input
+        type="number"
+        value={formData.stock}
+        onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+        placeholder="Stock"
+      />
+
+      <select
+        value={formData.category_name}
+        onChange={(e) => setFormData({ ...formData, category_name: e.target.value })}
+        className="border p-3 rounded-md w-full"
+      >
         <option value="">Select Category</option>
         {categories.map((c) => (
           <option key={c.id} value={c.name}>{c.name}</option>
         ))}
       </select>
 
-      <select name="city" value={formData.city} onChange={(e) => setFormData({ ...formData, city: e.target.value })} className="border p-3 rounded-md w-full">
+      <select
+        value={formData.city}
+        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+        className="border p-3 rounded-md w-full"
+      >
         <option value="">Select City</option>
         {CITIES.map((city) => (
           <option key={city} value={city}>{city}</option>
         ))}
       </select>
 
-      <Input type="number" name="pincode" maxLength={6} value={formData.pincode} onChange={(e) => setFormData({ ...formData, pincode: e.target.value })} placeholder="Pincode (6 digits)" />
+      <Input
+        type="number"
+        value={formData.pincode}
+        onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
+        placeholder="Pincode (6 digits)"
+      />
+
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+        className="border p-3 rounded-md w-full"
+      />
 
       <Button className="w-full bg-blue-600 text-white" onClick={submit}>
         Add Product

@@ -1,16 +1,18 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { addToCart } from "../services/service";
 import { useCart } from "../context/cartContext";
+
 interface Product {
   id: number;
   name: string;
   price: number;
   stock?: number;
   description?: string;
+  image?: string;
   deal_price: number;
   city?: string;
   discount_percent?: number;
@@ -20,6 +22,7 @@ export default function TrendingDealsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { refreshCart } = useCart();
+
   useEffect(() => {
     const id = toast.loading("Fetching trending deals");
 
@@ -54,11 +57,22 @@ export default function TrendingDealsPage() {
         {products.map((product) => {
           const limitedStock =
             product.stock !== undefined && product.stock <= 3;
+
           return (
             <div
               key={product.id}
               className="rounded-xl p-5 bg-white border border-gray-200 shadow-md hover:shadow-lg transition-all"
             >
+              {product.image ? (
+                <img
+                  src={`http://localhost:8080${product.image}`}
+                  alt={product.name}
+                  className="w-full h-40 object-cover rounded-lg mb-3"
+                />
+              ) : (
+                <div className="w-full h-40 bg-gray-200 rounded-lg mb-3"></div>
+              )}
+
               <div className="flex justify-between items-start">
                 <h3 className="font-semibold text-lg">{product.name}</h3>
                 <span className="px-2 py-1 text-xs font-semibold bg-red-100 text-red-600 rounded-lg">

@@ -11,6 +11,7 @@ interface Product {
   description: string;
   price: string;
   stock: number;
+  image?: string;
 }
 
 export default function CategoryProductsPage() {
@@ -57,26 +58,45 @@ export default function CategoryProductsPage() {
         <p className="text-gray-500">No items available in this category</p>
       ) : (
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="border rounded-lg p-4 shadow-sm hover:shadow-md transition"
-            >
-              <h2 className="font-semibold text-lg">{product.name}</h2>
-              <p className="text-sm text-gray-500 line-clamp-2">
-                {product.description || "No description"}
-              </p>
-              <p className="text-blue-600 font-bold mt-2">
-                ₹{Number(product.price).toFixed(2)}
-              </p>
-              <p className="text-xs text-gray-500">
-                Stock: {product.stock ?? "N/A"}
-              </p>
-              <Button className="mt-3 w-full bg-blue-600 text-white">
-                View Details
-              </Button>
-            </div>
-          ))}
+          {products.map((product) => {
+            const imageUrl = product.image
+              ? `http://localhost:8080${product.image}`
+              : "/placeholder.png";
+
+            return (
+              <div
+                key={product.id}
+                className="border rounded-lg p-4 shadow-sm hover:shadow-md transition"
+              >
+                <img
+                  src={imageUrl}
+                  alt={product.name}
+                  className="w-full h-40 object-cover rounded-md"
+                />
+
+                <h2 className="font-semibold text-lg">{product.name}</h2>
+
+                <p className="text-sm text-gray-500 line-clamp-2">
+                  {product.description || "No description"}
+                </p>
+
+                <p className="text-blue-600 font-bold mt-2">
+                  ₹{Number(product.price).toFixed(2)}
+                </p>
+
+                <p className="text-xs text-gray-500">
+                  Stock: {product.stock ?? "N/A"}
+                </p>
+
+                <Button
+                  className="mt-3 w-full bg-blue-600 text-white"
+                  onClick={() => router.push(`/product/${product.id}`)}
+                >
+                  View Details
+                </Button>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getCart, saveCart } from "../services/service";
 
+
 interface CartItem {
   id: number;
   name: string;
@@ -27,7 +28,7 @@ const CartContext = createContext<CartContextType>({
   addItem: () => {},
   removeItem: () => {},
   clearCart: () => {},
-  refreshCart: () => {}
+  refreshCart: () => {},
 });
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
@@ -86,7 +87,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         addItem,
         removeItem,
         clearCart,
-        refreshCart
+        refreshCart,
       }}
     >
       {children}
