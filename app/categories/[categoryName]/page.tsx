@@ -17,12 +17,12 @@ export default function CategoryProductsPage() {
   const params = useParams();
   const router = useRouter();
   const categoryName = decodeURIComponent(params.categoryName as string);
-  console.log("Category Name:", categoryName);
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    toast.loading("Loading products...");
+    const toastId = toast.loading("Loading products...");
 
     fetch(
       `http://localhost:8080/products/category/${encodeURIComponent(
@@ -32,12 +32,13 @@ export default function CategoryProductsPage() {
       .then((res) => res.json())
       .then((data) => {
         setProducts(data.data || []);
-        toast.success("Products loaded!");
-        setLoading(false);
+        toast.success("Products loaded!", { id: toastId });
       })
       .catch((err) => {
-        toast.error("Failed to load products!");
         console.error(err);
+        toast.error("Failed to load products!", { id: toastId });
+      })
+      .finally(() => {
         setLoading(false);
       });
   }, [categoryName]);
@@ -45,7 +46,7 @@ export default function CategoryProductsPage() {
   return (
     <div className="p-6 space-y-4">
       <Button variant="outline" onClick={() => router.push("/categories")}>
-        🔙 Back
+        ← Back
       </Button>
 
       <h1 className="text-2xl font-bold">{categoryName}</h1>
