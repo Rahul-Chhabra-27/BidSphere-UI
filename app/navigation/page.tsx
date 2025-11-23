@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Menu, LogOut, PlusCircle, Flame, ShoppingCart } from "lucide-react";
+import { Menu, LogOut, ShoppingCart } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/app/context/cartContext";
@@ -10,17 +10,23 @@ import { useCart } from "@/app/context/cartContext";
 export default function Navbar() {
   const router = useRouter();
   const { count } = useCart();
+
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const storedUsername = localStorage.getItem("username");
+
     setIsLoggedIn(!!token);
+    if (storedUsername) setUsername(storedUsername);
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
+    localStorage.removeItem("username");
     setIsLoggedIn(false);
     router.push("/");
   };
@@ -28,7 +34,6 @@ export default function Navbar() {
   const navItems = [
     { label: "Trending Deals", href: "/trending" },
     { label: "Categories", href: "/" },
-    { label: "Surprise Box", href: "/surprise" },
     { label: "About Us", href: "/about" },
     { label: "Sell on BidSphere", href: "/sell" },
   ];
@@ -54,6 +59,13 @@ export default function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-3">
+
+          {/* Username */}
+          {isLoggedIn && (
+            <span className="font-medium text-gray-700">
+              Hello, {username}
+            </span>
+          )}
 
           {/* Cart */}
           <Link href="/cart" className="relative">
@@ -89,12 +101,13 @@ export default function Navbar() {
           )}
         </div>
 
+        {/* Mobile Menu Button */}
         <button className="md:hidden" onClick={() => setOpen(!open)}>
           <Menu className="w-7 h-7" />
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile menu */}
       {open && (
         <div className="md:hidden bg-white border-t shadow-sm px-4 py-3 space-y-3">
           {navItems.map((item) => (
@@ -108,11 +121,12 @@ export default function Navbar() {
             </Link>
           ))}
 
-          {/* Mobile Cart */}
-          <Link href="/cart" className="block text-sm">Cart ({count})</Link>
+          <Link href="/cart" className="block text-sm">
+            Cart ({count})
+          </Link>
 
           {isLoggedIn && (
-            <Link href="/orders" className="block text-sm">My Orders</Link>
+            <span className="block text-sm">Hello, {username}</span>
           )}
 
           {!isLoggedIn ? (

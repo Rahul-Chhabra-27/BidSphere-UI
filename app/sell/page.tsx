@@ -57,7 +57,7 @@ export default function SellProductPage() {
     };
 
     const id = toast.loading("Adding product");
-
+    console.log(payload)
     fetch("http://localhost:8080/products/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

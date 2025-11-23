@@ -72,7 +72,11 @@ export default function CategoryProductsPage() {
               <p className="text-xs text-gray-500">
                 Stock: {product.stock ?? "N/A"}
               </p>
-              <Button className="mt-3 w-full bg-blue-600 text-white">
+              {/* Navigate to product details page */}
+              <Button
+                className="mt-3 w-full bg-blue-600 text-white"
+                onClick={() => router.push(`/products/${product.id}`)}
+              >
                 View Details
               </Button>
             </div>
