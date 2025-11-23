@@ -43,7 +43,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto flex items-center justify-between p-4 gap-4">
         
         <Link href="/" className="text-xl font-bold text-blue-600">
-          BIDSphere
+          BidSphere
         </Link>
 
         <div className="hidden md:flex items-center gap-6">
