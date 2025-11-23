@@ -40,7 +40,7 @@ export default function CategoriesPage() {
   useEffect(() => {
     const loadToast = toast.loading("Fetching categories...");
 
-    fetch("http://localhost:8000/categories/")
+    fetch("http://localhost:8080/categories/")
       .then((res) => res.json())
       .then((data) => {
         setCategories(data.data || []);

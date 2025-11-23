@@ -52,7 +52,7 @@ export default function SellProductPage() {
       price: Number(formData.price),
       stock: Number(formData.stock),
       category_name: formData.category_name,
-      location: formData.city, 
+      city: formData.city, 
     };
 
     const id = toast.loading("Adding product...");

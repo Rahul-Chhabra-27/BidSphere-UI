@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-
+import { addToCart } from "../services/service";
+import { useCart } from "../context/cartContext";
 interface Product {
   id: number;
   name: string;
@@ -12,12 +13,13 @@ interface Product {
   description?: string;
   deal_price: number;
   city?: string;
+  discount_percent?: number;
 }
 
 export default function TrendingDealsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const { refreshCart } = useCart();
   useEffect(() => {
     const id = toast.loading("Fetching trending deals");
 
@@ -27,12 +29,11 @@ export default function TrendingDealsPage() {
         const allProducts = data.data || [];
         const shuffled = [...allProducts].sort(() => 0.5 - Math.random());
         const selected = shuffled.slice(0, 10);
-        const enriched = selected.map((p) => ({
+        const enriched = selected.map((p: any) => ({
           ...p,
           deal_price: Math.round(Number(p.price) * 0.8),
-          discount_percent: Math.round((1 - 0.8) * 100),
+          discount_percent: 20,
         }));
-        console.log(enriched)
         setProducts(enriched);
         toast.success("Deals loaded", { id });
         setLoading(false);
@@ -89,8 +90,23 @@ export default function TrendingDealsPage() {
                 )}
               </div>
 
-              <Button className="mt-4 w-full bg-orange-600 hover:bg-orange-700 text-white">
-                Grab Deal
+              <Button
+                className="mt-4 w-full bg-orange-600 hover:bg-orange-700 text-white"
+                onClick={() => {
+                  const userIdRaw = localStorage.getItem("userId");
+                  const userId = userIdRaw ? Number(userIdRaw) : 0;
+
+                  if (!userId) {
+                    toast.error("Please login to add to cart");
+                    return;
+                  }
+
+                  addToCart(userId, product);
+                  refreshCart();
+                  toast.success("Added to cart");
+                }}
+              >
+                Add to Cart
               </Button>
             </div>
           );

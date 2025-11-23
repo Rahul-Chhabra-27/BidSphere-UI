@@ -22,34 +22,18 @@ export default function CategoryProductsPage() {
   const router = useRouter();
   const categoryName = decodeURIComponent(params.categoryName as string);
   
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
+ 
   const [selectedLocation, setSelectedLocation] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
-  const fetchProducts = (
-    locOverride?: string, 
-    minOverride?: string, 
-    maxOverride?: string
-  ) => {
+  useEffect(() => {
     setLoading(true);
-    
-    const loc = locOverride !== undefined ? locOverride : selectedLocation;
-    const min = minOverride !== undefined ? minOverride : minPrice;
-    const max = maxOverride !== undefined ? maxOverride : maxPrice;
-
-    const queryParams = new URLSearchParams();
-    
-    if (loc && loc !== "All") queryParams.append("location", loc);
-    
-    if (min) queryParams.append("min_price", min);
-    
-    if (max) queryParams.append("max_price", max);
-
-
-    const url = `http://localhost:8000/products/category/${encodeURIComponent(categoryName)}/?${queryParams.toString()}`;
+    const url = `http://localhost:8080/products/category/${encodeURIComponent(categoryName)}/`;
 
     fetch(url)
       .then((res) => {
@@ -57,14 +41,39 @@ export default function CategoryProductsPage() {
         return res.json();
       })
       .then((data) => {
-        setProducts(data.data || []);
+        const items = data.data || [];
+        setAllProducts(items); 
+        setProducts(items);    
         setLoading(false);
       })
       .catch((err) => {
         console.error(err);
-        setProducts([]); 
+        setAllProducts([]);
+        setProducts([]);
         setLoading(false);
+        toast.error("Failed to load products");
       });
+  }, [categoryName]);
+
+  const applyFilters = () => {
+    let filtered = [...allProducts]; 
+
+    if (selectedLocation && selectedLocation !== "All") {
+      filtered = filtered.filter((p) => 
+        p.location?.toLowerCase() === selectedLocation.toLowerCase()
+      );
+    }
+
+    if (minPrice) {
+      filtered = filtered.filter((p) => Number(p.price) >= Number(minPrice));
+    }
+
+    if (maxPrice) {
+      filtered = filtered.filter((p) => Number(p.price) <= Number(maxPrice));
+    }
+
+    setProducts(filtered); 
+    toast.success(`Found ${filtered.length} items`);
   };
 
   const handlePriceChange = (setter: (val: string) => void, value: string) => {
@@ -77,14 +86,10 @@ export default function CategoryProductsPage() {
     setMinPrice("");
     setMaxPrice("");
     
-    fetchProducts("", "", ""); 
+    setProducts(allProducts); 
     
     toast.success("Filters cleared");
   };
-
-  useEffect(() => {
-    fetchProducts();
-  }, [categoryName]); 
 
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
@@ -95,7 +100,7 @@ export default function CategoryProductsPage() {
         <h1 className="text-3xl font-bold capitalize">{categoryName}</h1>
       </div>
 
-      
+      {}
       <div className="bg-white p-5 rounded-xl border shadow-sm flex flex-wrap gap-6 items-end">
         
         <div className="flex flex-col gap-2 w-full sm:w-auto">
@@ -136,7 +141,8 @@ export default function CategoryProductsPage() {
         </div>
 
         <div className="flex gap-2">
-          <Button onClick={() => fetchProducts()} className="bg-black hover:bg-gray-800 text-white">
+          {}
+          <Button onClick={applyFilters} className="bg-black hover:bg-gray-800 text-white">
             Apply Filters
           </Button>
           <Button 
@@ -149,6 +155,7 @@ export default function CategoryProductsPage() {
         </div>
       </div>
 
+      {}
       {loading ? (
         <p className="text-center py-10 text-gray-500">Loading items...</p>
       ) : products.length === 0 ? (
