@@ -36,6 +36,16 @@ export default function SellProductPage() {
       .catch(() => toast.error("Failed to load categories"));
   }, []);
 
+  const handleNonNegativeInput = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
+    const val = e.target.value;
+    if (val === "") {
+        setFormData({ ...formData, [field]: "" });
+        return;
+    }
+    if (Number(val) < 0) return;
+    setFormData({ ...formData, [field]: val });
+  };
+
   const submit = () => {
     if (!formData.name || !formData.price || !formData.category_name || !formData.city || !formData.pincode) {
       toast.error("All fields required");
@@ -52,7 +62,7 @@ export default function SellProductPage() {
       price: Number(formData.price),
       stock: Number(formData.stock),
       category_name: formData.category_name,
-      city: formData.city, 
+      location: formData.city,
     };
 
     const id = toast.loading("Adding product...");
@@ -99,11 +109,25 @@ export default function SellProductPage() {
         <div className="grid grid-cols-2 gap-4">
             <div>
                 <label className="text-sm font-medium text-gray-700">Price (₹)</label>
-                <Input type="number" name="price" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} placeholder="0.00" />
+                <Input 
+                    type="number" 
+                    name="price" 
+                    value={formData.price} 
+                    onChange={(e) => handleNonNegativeInput(e, "price")} 
+                    placeholder="0.00" 
+                    min="0"
+                />
             </div>
             <div>
                 <label className="text-sm font-medium text-gray-700">Stock</label>
-                <Input type="number" name="stock" value={formData.stock} onChange={(e) => setFormData({ ...formData, stock: e.target.value })} placeholder="1" />
+                <Input 
+                    type="number" 
+                    name="stock" 
+                    value={formData.stock} 
+                    onChange={(e) => handleNonNegativeInput(e, "stock")} 
+                    placeholder="1" 
+                    min="0"
+                />
             </div>
         </div>
 
@@ -129,7 +153,15 @@ export default function SellProductPage() {
             </div>
             <div>
                 <label className="text-sm font-medium text-gray-700">Pincode</label>
-                <Input type="number" name="pincode" maxLength={6} value={formData.pincode} onChange={(e) => setFormData({ ...formData, pincode: e.target.value })} placeholder="6 digits" />
+                <Input 
+                    type="number" 
+                    name="pincode" 
+                    maxLength={6} 
+                    value={formData.pincode} 
+                    onChange={(e) => handleNonNegativeInput(e, "pincode")} 
+                    placeholder="6 digits" 
+                    min="0"
+                />
             </div>
         </div>
 
