@@ -101,14 +101,13 @@ export default function CategoryProductsPage() {
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
       <div className="flex items-center justify-between">
         <Button variant="outline" onClick={() => router.push("/categories")}>
-          🔙 Back
+          Back
         </Button>
         <h1 className="text-3xl font-bold capitalize">{categoryName}</h1>
       </div>
 
       <div className="bg-white p-5 rounded-xl border shadow-sm flex flex-wrap gap-6 items-end">
 
-    
         <div className="flex flex-col gap-2 w-full sm:w-auto">
           <label className="text-sm font-semibold text-gray-700">Location</label>
           <select
@@ -151,7 +150,6 @@ export default function CategoryProductsPage() {
           </div>
         </div>
 
-        {/* Buttons */}
         <div className="flex gap-2">
           <Button
             onClick={applyFilters}
@@ -169,7 +167,6 @@ export default function CategoryProductsPage() {
         </div>
       </div>
 
-      {/* Results */}
       {loading ? (
         <p className="text-center py-10 text-gray-500">Loading items...</p>
       ) : products.length === 0 ? (
@@ -214,7 +211,7 @@ export default function CategoryProductsPage() {
 
                 <Button
                   className="mt-3 w-full bg-blue-600 text-white"
-                  onClick={() => router.push(`/products/${product.id}`)}
+                  onClick={() => router.push(`/product/${product.id}`)}
                 >
                   View Details
                 </Button>

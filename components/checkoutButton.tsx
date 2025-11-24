@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 export default function CheckoutButton() {
-  const { cart, cartCount, totalAmount, clearCart } = useCart();
+  const { cart, cartCount, totalAmount } = useCart();
   const router = useRouter();
 
   const handleCheckout = async () => {
@@ -16,7 +16,6 @@ export default function CheckoutButton() {
     }
 
     const toastId = toast.loading("Creating order...");
-    console.log("Authorization", `Bearer ${localStorage.getItem("token")}`);
     const res = await fetch("http://localhost:8080/create-order/", {
       method: "POST",
       headers: {
@@ -34,9 +33,10 @@ export default function CheckoutButton() {
 
     if (!res.ok) {
       toast.error(data.error || "Failed to create order");
+      router.push("/cart");
       return;
     }
-    console.log(data)
+
     startPayment(data);
   };
 
@@ -58,18 +58,23 @@ export default function CheckoutButton() {
         });
 
         if (verify.ok) {
-          clearCart();
-          toast.success("Payment Successful 🎉");
+          toast.success("Payment Completed");
           router.push("/orders/success");
         } else {
-          toast.error("Payment verification failed ❌");
+          toast.error("Payment failed");
+          router.push("/cart");
         }
+      },
+      modal: {
+        ondismiss: function () {
+          toast.error("Payment cancelled");
+          router.push("/cart");
+        },
       },
       theme: { color: "#2563eb" },
     };
 
-    // @ts-ignore
-    const rzp = new window.Razorpay(options);
+    const rzp = new (window as any).Razorpay(options);
     rzp.open();
   };
 
