@@ -35,9 +35,9 @@ export default function SellProductPage() {
     fetch("http://localhost:8080/categories/")
       .then((res) => res.json())
       .then((data) => setCategories(data.data || []))
-      .catch(() => {});
+      .catch(() => toast.error("Failed to load categories"));
   }, []);
-  console.log(categories);
+
   const submit = () => {
     if (
       !formData.name ||
@@ -66,16 +66,18 @@ export default function SellProductPage() {
     uploadData.append("pincode", formData.pincode);
     uploadData.append("image", imageFile);
 
-    const id = toast.loading("Adding product...");
+    const id = toast.loading("Adding product");
 
     fetch("http://localhost:8080/products/", {
       method: "POST",
       body: uploadData,
     })
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (!res.ok) throw new Error("Failed to add");
+        return res.json();
+      })
       .then(() => {
-        toast.success("Product added successfully!", { id });
-
+        toast.success("Product added successfully", { id });
         setFormData({
           name: "",
           description: "",
@@ -85,15 +87,14 @@ export default function SellProductPage() {
           city: "",
           pincode: ""
         });
-
         setImageFile(null);
       })
       .catch(() => toast.error("Error adding product", { id }));
   };
 
   return (
-    <div className="max-w-xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-bold text-center">Sell Something</h1>
+    <div className="max-w-xl mx-auto p-6 space-y-6 bg-white shadow-md rounded-lg mt-10">
+      <h1 className="text-3xl font-bold text-center text-gray-800">Sell Something</h1>
 
       <Input
         value={formData.name}
@@ -157,8 +158,8 @@ export default function SellProductPage() {
         className="border p-3 rounded-md w-full"
       />
 
-      <Button className="w-full bg-blue-600 text-white" onClick={submit}>
-        Add Product
+      <Button className="w-full bg-black hover:bg-gray-800 text-white h-12 text-lg" onClick={submit}>
+        List Item for Sale
       </Button>
     </div>
   );

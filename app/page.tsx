@@ -10,7 +10,6 @@ export default function Home() {
         <p className="text-gray-600 mt-2">Buy & Sell Categories</p>
       </div>
 
-      {/* Categories Section */}
       <CategoriesPage />
     </div>
   );
